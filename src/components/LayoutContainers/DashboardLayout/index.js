@@ -58,7 +58,7 @@ function DashboardLayout({ children }) {
 
 // Typechecking props for the DashboardLayout
 DashboardLayout.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
 };
 
 export default DashboardLayout;

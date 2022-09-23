@@ -43,15 +43,16 @@ function CoverLayout({ coverHeight, image, children }) {
           backgroundRepeat: "no-repeat",
         }}
       />
-      <MDBox mt={{ xs: -20, lg: -18 }} px={1} width="calc(100% - 2rem)" mx="auto">
-        <Grid container spacing={1} justifyContent="center">
-          <Grid item xs={11} sm={9} md={5} lg={4} xl={3}>
-            {children}
-          </Grid>
-        </Grid>
+      <MDBox mt={{ xs: -25, lg: -18 }} px={1} width="100%" mx="auto"  sx={{display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+    }} mb={10}>
+              {children}
+              
       </MDBox>
-      <Footer />
+     
     </PageLayout>
+    
   );
 }
 
@@ -63,8 +64,8 @@ CoverLayout.defaultProps = {
 // Typechecking props for the CoverLayout
 CoverLayout.propTypes = {
   coverHeight: PropTypes.string,
-  image: PropTypes.string,
-  children: PropTypes.node,
+  image: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 export default CoverLayout;

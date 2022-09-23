@@ -55,7 +55,7 @@ MDButton.propTypes = {
   ]),
   circular: PropTypes.bool,
   iconOnly: PropTypes.bool,
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
 };
 
 export default MDButton;

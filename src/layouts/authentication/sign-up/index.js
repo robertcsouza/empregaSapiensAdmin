@@ -1,15 +1,19 @@
+import * as React from 'react';
 // react-router-dom components
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
-import Checkbox from "@mui/material/Checkbox";
 
-// Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import MDInput from "components/MDInput";
-import MDButton from "components/MDButton";
+
+//import material UI 
+
+import Box from '@mui/material/Box';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Button from '@mui/material/Button';
+
 
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
@@ -17,85 +21,246 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 // Images
 import bgImage from "assets/images/bg-sign-up-cover.jpeg";
 
+//components 
+
+import CreateUserForm from './components/CreateUserForm';
+import CreateCompanyForm from './components/CreateCompanyForm';
+import Convenio from './components/Convenio';
+import MDSnackbar from "components/MDSnackbar";
+import { useDispatch } from 'react-redux';
+import { updateCompany, create } from "slices/userSlice";
+
+
+
+
 function Cover() {
+  const steps = ['Email e Senha', 'Informações Pessoais', 'Convênio'];
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [successSB, setSuccessSB] = React.useState(false);
+  
+  const dispatch = useDispatch();
+
+
+  let navigate = useNavigate();
+  const openSuccessSB = () => setSuccessSB(true);
+  const closeSuccessSB = () => setSuccessSB(false);
+  const openErrorSB = () => setErrorSB(true);
+  const closeErrorSB = () => setErrorSB(false);
+  const [errorSB, setErrorSB] = React.useState(false);
+  const [content, setContent] = React.useState("")
+
+  async function handleCreate(createUser) {
+    // setCreateUser(createUser);
+    const { email, senha: password, repetirSenha, termos } = createUser;
+
+    try {
+      if (password !== repetirSenha || !password || !repetirSenha) {
+        throw "Senhas diferentes";
+      }
+
+      if (password.length < 6) {
+        throw "Senhas Muito Fraca";
+      }
+
+      if (!termos) {
+        throw "Necessário Aceitar os termos de Uso";
+      }
+
+      const payload = { email, password };
+
+      const result = await dispatch(create(payload));
+
+      if (!!result.payload.error) {
+        throw result.payload.error;
+      }
+
+      openSuccessSB();
+      handleNext();
+
+    } catch (error) {
+
+      setContent(error.toString())
+      openErrorSB();
+
+      return;
+    }
+
+
+
+  }
+
+  async function handleUpdate(updateUser) {
+    // setCreateUser(createUser);
+
+    try {
+      const {
+        nome,
+        cnpj,
+        sobre,
+        telefone,
+        residencial,
+        responsavel,
+        ramo,
+        estado,
+        cidade,
+        bairro,
+        rua,
+        numero,
+        cep,
+      } = updateUser
+      const perfil = { nome, cnpj, telefone, residencial, sobre, responsavel, ramo };
+      const endereco = { estado, cidade, bairro, rua, numero, cep };
+
+      const payload = { perfil, endereco };
+
+
+      const result = await dispatch(updateCompany(payload));
+
+
+
+      if (!!result.payload.error) {
+        throw "Não foi possivel executar a ação";
+      }
+      openSuccessSB();
+      handleNext();
+
+    } catch (error) {
+      setContent(error.toString())
+      openErrorSB();
+    }
+
+
+  }
+
+
+
+  const handleNext = () => {
+
+
+
+    if (activeStep === steps.length - 1) {
+
+      //navigate('/dashboard')
+    } else {
+
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+
+    }
+
+
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+
+
+  function render(step) {
+    switch (step) {
+      case 0:
+        
+        return <CreateUserForm onCreateUser={handleCreate} />;
+
+      case 1:
+
+        return <CreateCompanyForm onUpdateUser={handleUpdate} />
+
+      case 2:
+        return <Convenio />
+
+      default:
+        return (<div>Step debug error</div>)
+
+    }
+  }
+
+  const renderErrorSB = (
+    <MDSnackbar
+      color="error"
+      icon="warning"
+      title="Erro ao Cadastrar"
+      content={content}
+      dateTime="1 min ago"
+      open={errorSB}
+      onClose={closeErrorSB}
+      close={closeErrorSB}
+      bgWhite
+    />
+  );
+  const renderSuccessSB = (
+    <MDSnackbar
+      color="success"
+      icon="check"
+      title="Cadastrada com sucesso"
+      content="Empresa foi Cadastrada com sucesso!"
+      dateTime="Agora"
+      open={successSB}
+      onClose={closeSuccessSB}
+      close={closeSuccessSB}
+      bgWhite
+    />
+  );
   return (
-    <CoverLayout image={bgImage}>
-      <Card>
-        <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="success"
-          mx={2}
-          mt={-3}
-          p={3}
-          mb={1}
-          textAlign="center"
-        >
-          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            Junte-se a Nós
-          </MDTypography>
-          <MDTypography display="block" variant="button" color="white" my={1}>
-            Entre com seu RA
-          </MDTypography>
-        </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
-            <MDBox mb={2}>
-              <MDInput type="text" label="Nome" variant="standard" fullWidth />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput type="text" label="RA" variant="standard" fullWidth />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput type="password" label="Senha" variant="standard" fullWidth />
-            </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Checkbox />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
+    <CoverLayout image={bgImage} sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}>
+      {renderErrorSB}
+      {renderSuccessSB}
+     
+
+      <Card pt={4} pb={5} px={3} sx={{ width: "40%", minWidth: 350 }}>
+
+        <Box sx={{ width: '100%' }}>
+          <Stepper activeStep={activeStep} alternativeLabel>
+            {steps.map((label) => (
+              <Step key={label} color="warning">
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+
+          <React.Fragment>
+            {render(activeStep)}
+            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+              <Button
+                color="inherit"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                sx={{ mr: 1 }}
               >
-                &nbsp;&nbsp;Aceitar os &nbsp;
-              </MDTypography>
-              <MDTypography
-                component="a"
-                href="#"
-                variant="button"
-                fontWeight="bold"
-                color="info"
-                textGradient
+                Voltar
+              </Button>
+              <Box sx={{ flex: '1 1 auto' }} />
+
+              <Button
+                color="inherit"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                sx={{ mr: 1 }}
               >
-                Termos e condições
-              </MDTypography>
-            </MDBox>
-            <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
-                sign in
-              </MDButton>
-            </MDBox>
-            <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
-                Já tem uma conta ?{" "}
-                <MDTypography
-                  component={Link}
-                  to="/authentication/sign-in"
-                  variant="button"
-                  color="info"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  fazer Login
-                </MDTypography>
-              </MDTypography>
-            </MDBox>
-          </MDBox>
-        </MDBox>
+                Voltar
+              </Button>
+
+            </Box>
+          </React.Fragment>
+
+        </Box>
+
+
       </Card>
     </CoverLayout>
   );
 }
 
 export default Cover;
+
+/*
+
+<Button onClick={handleNext}>
+                {activeStep === steps.length - 1 ? 'Salvar' : 'Avançar'}
+              </Button>
+
+*/

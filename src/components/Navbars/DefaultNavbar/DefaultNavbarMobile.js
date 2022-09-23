@@ -34,7 +34,7 @@ function DefaultNavbarMobile({ open, close }) {
       <MDBox px={0.5}>
         <DefaultNavbarLink icon="donut_large" name="dashboard" route="/dashboard" />
         <DefaultNavbarLink icon="person" name="profile" route="/profile" />
-        <DefaultNavbarLink icon="account_circle" name="sign up" route="/authentication/sign-up" />
+        <DefaultNavbarLink icon="account_circle" name="sign up" route="/cadastro" />
         <DefaultNavbarLink icon="key" name="sign in" route="/authentication/sign-in" />
       </MDBox>
     </Menu>
@@ -43,8 +43,8 @@ function DefaultNavbarMobile({ open, close }) {
 
 // Typechecking props for the DefaultNavbarMenu
 DefaultNavbarMobile.propTypes = {
-  open: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
-  close: PropTypes.oneOfType([PropTypes.func, PropTypes.bool, PropTypes.object]),
+  open: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
+  close: PropTypes.oneOfType([PropTypes.func, PropTypes.bool, PropTypes.object]).isRequired,
 };
 
 export default DefaultNavbarMobile;

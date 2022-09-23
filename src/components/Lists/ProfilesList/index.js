@@ -86,8 +86,8 @@ ProfilesList.defaultProps = {
 
 // Typechecking props for the ProfilesList
 ProfilesList.propTypes = {
-  title: PropTypes.string,
-  profiles: PropTypes.arrayOf(PropTypes.object),
+  title: PropTypes.string.isRequired,
+  profiles: PropTypes.arrayOf(PropTypes.object).isRequired,
   shadow: PropTypes.bool,
 };
 

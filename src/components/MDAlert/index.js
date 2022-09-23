@@ -65,7 +65,7 @@ MDAlert.propTypes = {
     "dark",
   ]),
   dismissible: PropTypes.bool,
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
 };
 
 export default MDAlert;

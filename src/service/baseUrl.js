@@ -1,3 +1,6 @@
-const baseURL= "https://api.empregasapiens.com.br";
+
+const baseURL = "https://api.empregasapiens.com.br";
+
+
 
 export default baseURL;

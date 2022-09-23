@@ -14,25 +14,26 @@ import PersonalForm from "./components/personalForm";
 
 
 
+
 // Overview page components
 import Header from "layouts/profile/components/Header";
 import { Icon } from '@mui/material';
 import Tooltip from "@mui/material/Tooltip";
-import { UsuarioHK } from '../../hooks/usuario/usuarioHK'
-import { HabilidadesHK } from 'hooks/habilidade/habilidadeHk';
+
 import auth from '../../service/auth'
 
 import { useSelector, useDispatch } from "react-redux";
-import { profile, load } from 'slices/userSlice';
+import { profile, load } from "slices/userSlice";
+import SnackBarComponent from 'components/SnackBarComponent';
+import baseURL from 'service/baseUrl';
 
 
 function Overview() {
-  const usuariohook = UsuarioHK();
-  const habilidadeshook = HabilidadesHK();
   const dispatch = useDispatch();
-  const profile = useSelector(state => state.user.profile)
-  const habilidadesRd = useSelector(state => state.habilidades.habilidades);
 
+  // if (profile.id === -1) {
+  //   dispatch(load())
+  // }
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -45,12 +46,7 @@ function Overview() {
           navigate('/', { replace: true });
         }
 
-        if (profile.id === -1) {
-          usuariohook();
-        }
-        if (!habilidadesRd) {
-          habilidadeshook();
-        }
+        dispatch(load());
 
       } catch (error) {
 
@@ -60,46 +56,74 @@ function Overview() {
 
     }
     isAuthenticate();
+
   }, [])
 
-
+  const status = useSelector(state => state.user.status)
+  const company = useSelector(state => state.user.company)
+  const [content, setContent] = useState({ 'name': 'information', 'content': <PersonalInformation /> })
+  const [snackContent, setSnackContent] = useState({});
+  const [snackOpen, setSnackOpen] = useState(false);
+  const closeSnack = () => setSnackOpen(false);
+  function openSnack(content) {
+    setSnackContent(content)
+    setSnackOpen(true)
+  };
+  function callSnack(result){
+    if(result.payload.status === 200){
+      openSnack({ type: 'success', title: "Informações Pessoais", body: "Informações Pessoais Atualizadas com sucesso", dateTime: "1 min ago" });
+    }else{
+      openSnack({ type: 'error', title: "Informações Pessoais", body: "Nâo foi possivel atualizar as informações", dateTime: "1 min ago" });
+    }
+    
+  }
   function alterContent() {
 
     if (content.name === 'form') {
       setContent({ 'name': 'information', 'content': <PersonalInformation /> })
     } else {
-      setContent({ 'name': 'form', 'content': <PersonalForm /> })
+      setContent({ 'name': 'form', 'content': <PersonalForm callSnack={callSnack} /> })
 
     }
   }
 
-  const [content, setContent] = useState({ 'name': 'information', 'content': <PersonalInformation /> })
-  return (
-    <DashboardLayout className="teste">
-      <DashboardNavbar />
-      <MDBox mb={2} />
-      <Header name="Jhon Doe">
-        <MDBox mt={5} mb={3}>
 
-        </MDBox>
-        <MDBox pt={2} px={2} lineHeight={1.25}>
-          <MDTypography variant="h6" fontWeight="medium">
-            Informações Pessoais
+  if (status === 'sucess' && !!company.data) {
 
-            <MDButton variant="text" color="secondary" onClick={() => { alterContent() }}>
-              <Tooltip title="Editar" placement="top">
-                <Icon>edit</Icon>
-              </Tooltip>
-            </MDButton>
-          </MDTypography>
+    let empresa = company.data
+    
 
-          {content.content}
-        </MDBox>
+    return (
+      <DashboardLayout className="teste">
+        <DashboardNavbar />
+        <MDBox mb={2} />
+        <SnackBarComponent content={snackContent} open={snackOpen} closeSnack={closeSnack} />
+        <Header name={empresa.nome} responsavel={empresa.responsavel} image={`${baseURL}/${empresa.thumbnail}`}>
+          <MDBox mt={5} mb={3}>
 
-      </Header>
-      <Footer />
-    </DashboardLayout>
-  );
+          </MDBox>
+          <MDBox pt={2} px={2} lineHeight={1.25}>
+            <MDTypography variant="h6" fontWeight="medium">
+              Informações Pessoais
+
+              <MDButton variant="text" color="secondary" onClick={() => { alterContent() }}>
+                <Tooltip title="Editar" placement="top">
+                  <Icon>edit</Icon>
+                </Tooltip>
+              </MDButton>
+
+            </MDTypography>
+
+            {content.content}
+          </MDBox>
+
+        </Header>
+        <Footer />
+      </DashboardLayout>
+    );
+  } else {
+    return <div></div>
+  }
 }
 
 export default Overview;

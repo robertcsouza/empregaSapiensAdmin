@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import { Provider, useSelector } from 'react-redux'
+import {Provider} from 'react-redux'
 
 
 
@@ -40,13 +40,6 @@ import routes from "routes";
 // Material Dashboard 2 React contexts
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
-import { load } from "slices/userSlice";
-import { loadVagas } from "slices/vagaSlice";
-// import { usuarioHK } from "./hooks/usuario/usuarioHK";
-import { useNavigate } from "react-router-dom";
-import auth from './service/auth'
-
-
 // Images
 //import brandWhite from "assets/images/logo-ct.png";
 //import brandDark from "assets/images/logo-ct-dark.png";
@@ -66,35 +59,6 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   //const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-
-  // const user_hk = usuarioHK();
-  const token = sessionStorage.getItem('token');
-  const rd_user = useSelector(state => state.user);
-  let navigate = useNavigate();
-
-
-
-  useEffect(() => {
-
-    async function isAuthenticate() {
-
-      try {
-        const result = await auth();
-
-        if (result !== true) {
-          navigate('/');
-        }
-
-      } catch (error) {
-
-        navigate('/');
-
-      }
-
-    }
-    isAuthenticate();
-    // console.log(sessionStorage.getItem('token'));
-  }, []);
 
   // Cache for the rtl
   /*useMemo(() => {
@@ -131,10 +95,10 @@ export default function App() {
   }, [direction]);
 
   // Setting page scroll to 0 when changing the route
-  // useEffect(() => {
-  //   document.documentElement.scrollTop = 0;
-  //   document.scrollingElement.scrollTop = 0;
-  // }, [pathname]);
+  useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.scrollingElement.scrollTop = 0;
+  }, [pathname]);
 
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
@@ -143,7 +107,6 @@ export default function App() {
       }
 
       if (route.route) {
-
         return <Route exact path={route.route} element={route.component} key={route.key} />;
       }
 
@@ -204,7 +167,7 @@ export default function App() {
     */
   ) : (
 
-
+    
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       {layout === "dashboard" && (
@@ -218,7 +181,7 @@ export default function App() {
             onMouseLeave={handleOnMouseLeave}
           />
           <Configurator />
-          {configsButton}
+          
         </>
       )}
       {layout === "vr" && <Configurator />}
@@ -227,6 +190,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </ThemeProvider>
-
+    
   );
 }

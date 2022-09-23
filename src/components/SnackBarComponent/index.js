@@ -1,3 +1,15 @@
+/*
+ const [snackContent, setSnackContent] = useState({});
+  const [snackOpen, setSnackOpen] = useState(false);
+  const closeSnack = () => setSnackOpen(false);
+  function openSnack(content) {
+    setSnackContent(content)
+    setSnackOpen(true)
+  };
+openSnack({ type: 'success', title: "Candidatado com sucesso", body: "Sucesso ao candidatar-se a vaga,Boa Sorte :)", dateTime: "1 min ago" });
+ <SnackBarComponent content={snackContent} open={snackOpen} closeSnack={closeSnack} />
+*/
+
 import MDSnackbar from "components/MDSnackbar";
 function SnackBarComponent({ open, closeSnack, content }) {
   switch (content.type) {

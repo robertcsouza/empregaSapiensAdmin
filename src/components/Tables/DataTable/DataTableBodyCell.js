@@ -37,7 +37,7 @@ DataTableBodyCell.defaultProps = {
 
 // Typechecking props for the DataTableBodyCell
 DataTableBodyCell.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
   noBorder: PropTypes.bool,
   align: PropTypes.oneOf(["left", "right", "center"]),
 };

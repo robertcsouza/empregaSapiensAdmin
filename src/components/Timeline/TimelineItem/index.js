@@ -77,9 +77,9 @@ TimelineItem.propTypes = {
     "dark",
     "light",
   ]),
-  icon: PropTypes.node,
-  title: PropTypes.string,
-  dateTime: PropTypes.string,
+  icon: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
+  dateTime: PropTypes.string.isRequired,
   description: PropTypes.string,
   lastItem: PropTypes.bool,
 };

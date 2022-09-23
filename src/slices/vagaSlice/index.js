@@ -1,95 +1,121 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { loadAnalytics } from 'slices/analytics';
 import api from '../../service/api'
-import { loadSubscriptions } from 'slices/SubscriptionSlice';
 
 export const loadVagas = createAsyncThunk(
   'vagas',
-  async (pagination) => {
-    console.log("chamou o loadVagas")
-    let page = '/?page=1';
+  async (page) => {
 
-    if (!!pagination) {
-      page = pagination;
-    }
 
     const token = sessionStorage.getItem('token');
-    const result = await api.get(`/v1/student/opportunity${page}`, {
+
+    const result = await api.get(`/v1/company/opportunity/?page=${page}`, {
       headers: {
         'Authorization': `${token}`
       }
     })
-
-    return result.data
+    return result.data;
   }
 )
 
-
-export const searchVagas = createAsyncThunk(
-  'vagas',
-  async ({ pagination, query }) => {
-    let page = '?page=1';
-    let search = `query=`
-    if (!!query) {
-      search = `query=${query}`
-    }
-
-    if (!!pagination) {
-      page = pagination;
-    }
+export const getVagasId = createAsyncThunk(
+  'vagas/id',
+  async () => {
+    
 
     const token = sessionStorage.getItem('token');
-    const result = await api.get(`/v1/student/opportunity/search${page}&${search}`, {
+
+    const result = await api.get(`/v1/company/list/opportunity/`, {
       headers: {
         'Authorization': `${token}`
       }
     })
-
-
-    return result.data
-
-
-
+    return result.data;
   }
 )
 
-
-export const candidatarVagas = createAsyncThunk(
-  'vagas/candidate',
-  async (vagaId, thunkApi) => {
+export const getCandidates = createAsyncThunk(
+  'vagas/id',
+  async (id) => {
+    
 
     const token = sessionStorage.getItem('token');
-    const result = await api.post(`/v1/student/opportunity/regiter/${vagaId}`, {
-      "index": 0
-    }, {
+
+    const result = await api.get(`/v1/company/opportunity/list/${id}`, {
+      headers: {
+        'Authorization': `${token}`
+      }
+    })
+    return result.data;
+  }
+)
+
+export const createVagas = createAsyncThunk(
+  'vagas/create',
+  async (payload, thunkApi) => {
+     
+    const token = sessionStorage.getItem('token');
+
+    const result = await api.post('/v1/company/opportunity/create', payload, {
       headers: {
         'Authorization': `${token}`
       }
     })
 
-    thunkApi.dispatch(loadVagas())
-    thunkApi.dispatch(loadSubscriptions())
+    thunkApi.dispatch(loadVagas());
+    thunkApi.dispatch(loadAnalytics());
+    return result.data;
+  }
+)
 
-    // console.log(result.data.percentProfile)
+export const deleteVagas = createAsyncThunk(
+  'vagas/delete',
+  async (id, thunkApi) => {
+   
+    
+    const token = sessionStorage.getItem('token');
 
+    const result = await api.delete(`/v1/company/opportunity/${id}`, {
+      headers: {
+        'Authorization': `${token}`
+      }
+    })
 
-    return result
+    thunkApi.dispatch(loadVagas());
+    thunkApi.dispatch(loadAnalytics());
+    return result.data;
+  }
+)
 
+export const updateVagas = createAsyncThunk(
+  'vagas/delete',
+  async (params, thunkApi) => {
+    
+    const {id,concluido} = params;
+    const token = sessionStorage.getItem('token');
+    const payload = {concluido:concluido}
+    const result = await api.put(`/v1/company/opportunity/${id}`,payload, {
+      headers: {
+        'Authorization': `${token}`
+      }
+    })
 
-
+    thunkApi.dispatch(loadVagas());
+    return result.data;
   }
 )
 
 
 export const slice = createSlice({
   name: 'vagas',
-  initialState: {
-    vagas: null,
-  },
+  initialState: {},
   reducers: {
-    getProfile(state, { payload }) {
+    async getVagas(state, { payload }) {
 
-      return { ...state, profile: payload }
-    }
+
+      return { ...state, vagas: payload }
+    },
+    
   },
   extraReducers: {
     [loadVagas.pending]: (state, action) => {
@@ -100,28 +126,69 @@ export const slice = createSlice({
       state.vagas = payload
       state.status = 'sucess'
     },
-    [candidatarVagas.pending]: (state, action) => {
+    [loadVagas.rejected]: (state, action) => {
+      state.status = 'failed'
+    },
+    [createVagas.pending]: (state, action) => {
       state.status = 'loading'
     },
 
-    [candidatarVagas.fulfilled]: (state, { payload }) => {
-      state.vagasCandidate = payload;
+    [createVagas.fulfilled]: (state, { payload }) => {
+      state.vagas.create = payload
       state.status = 'sucess'
     },
-    [searchVagas.pending]: (state, action) => {
+    [createVagas.rejected]: (state, action) => {
+      state.status = 'failed'
+    },
+    
+    [getVagasId.pending]: (state, action) => {
       state.status = 'loading'
     },
 
-    [searchVagas.fulfilled]: (state, { payload }) => {
-      state.vagas = payload;
+    [getVagasId.fulfilled]: (state, { payload }) => {
+      state.candidates = payload
       state.status = 'sucess'
     },
+    [getCandidates.rejected]: (state, action) => {
+      state.status = 'failed'
+    },
+    [getCandidates.pending]: (state, action) => {
+      state.status = 'loading'
+    },
 
+    [getCandidates.fulfilled]: (state, { payload }) => {
+      state.vagasIds = payload
+      state.status = 'sucess'
+    },
+    [getCandidates.rejected]: (state, action) => {
+      state.status = 'failed'
+    },
+    [updateVagas.pending]: (state, action) => {
+      state.status = 'loading'
+    },
 
+    [updateVagas.fulfilled]: (state, { payload }) => {
+      state.updateVagas = payload
+      state.status = 'sucess'
+    },
+    [updateVagas.rejected]: (state, action) => {
+      state.status = 'failed'
+    },
+    [deleteVagas.pending]: (state, action) => {
+      state.status = 'loading'
+    },
+
+    [deleteVagas.fulfilled]: (state, { payload }) => {
+      state.deleteVagas = payload
+      state.status = 'sucess'
+    },
+    [deleteVagas.rejected]: (state, action) => {
+      state.status = 'failed'
+    },
   }
 });
 
-export const { getVaga } = slice.actions;
+export const { getVagas,getPagination } = slice.actions;
 
 export const vagas = state => state.vagas;
 

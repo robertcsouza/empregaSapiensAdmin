@@ -74,6 +74,16 @@ function Breadcrumbs({ icon, title, route, light }) {
 }
 
 // Setting default values for the props of Breadcrumbs
+Breadcrumbs.defaultProps = {
+  light: false,
+};
 
+// Typechecking props for the Breadcrumbs
+Breadcrumbs.propTypes = {
+  icon: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
+  route: PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired,
+  light: PropTypes.bool,
+};
 
 export default Breadcrumbs;

@@ -4,24 +4,23 @@ import api from '../../service/api'
 export const loadAlerts = createAsyncThunk(
   'alerts',
   async () => {
-    console.log('chamou o alerts Dispatch')
+    
     const token = sessionStorage.getItem('token');
-    const result = await api.get('/v1/student/alerts', {
+    const result = await api.get('/v1/company/alerts', {
       headers: {
         'Authorization': `${token}`
       }
-    })
-    //console.log("alerts ==>")
-    // console.log(result)
-    /* const result = {
-         "status": 200,
-         "data": [{id:1,title:"teste vaga com stpes",message:"Você tem uma notificação!",created_at: "2022-04-24T08:33:47.000-04:00",route:"/subscription"},{id:1,title:"Pessoa Desenvolvedora Java Sênior - Card Eficiência",message:"Mensgem recebida!!",created_at: "2022-04-24T08:33:47.000-04:00",route:"/subscription"},{id:1,title:"teste vaga com stpes",message:"Mensgem recebida!!",created_at: "2022-04-24T08:33:47.000-04:00",route:"/subscription"},],  
-         "sucess": true
-                  }*/
-    return result
+    });
+
+    /*const result = {
+        "status": 200,
+        "data": [{id:1,title:"teste vaga com stpes",message:"Você tem uma notificação!",created_at: "2022-04-24T08:33:47.000-04:00",route:"/subscription"},{id:1,title:"Pessoa Desenvolvedora Java Sênior - Card Eficiência",message:"Mensgem recebida!!",created_at: "2022-04-24T08:33:47.000-04:00",route:"/subscription"},{id:1,title:"teste vaga com stpes",message:"Mensgem recebida!!",created_at: "2022-04-24T08:33:47.000-04:00",route:"/subscription"},],  
+        "sucess": true
+                 }
+    return result*/
 
 
-    //return result.data
+    return result.data
 
 
   }
@@ -40,7 +39,7 @@ export const deleteAlerts = createAsyncThunk(
       }
     })
     thunkApi.dispatch(loadAlerts());
-    // console.log(result.data.percentProfile)
+   
 
 
     return result.data

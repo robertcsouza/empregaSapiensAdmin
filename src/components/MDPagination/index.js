@@ -74,7 +74,7 @@ MDPagination.propTypes = {
   ]),
   size: PropTypes.oneOf(["small", "medium", "large"]),
   active: PropTypes.bool,
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
 };
 
 export default MDPagination;

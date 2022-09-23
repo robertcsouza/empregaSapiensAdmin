@@ -24,9 +24,6 @@ import DefaultNavbarMobile from "components/Navbars/DefaultNavbar/DefaultNavbarM
 // Material Dashboard 2 React base styles
 import breakpoints from "assets/theme/base/breakpoints";
 
-import ApartmentIcon from '@mui/icons-material/Apartment';
-
-
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 
@@ -100,34 +97,24 @@ function DefaultNavbar({ transparent, light, action }) {
           pl={{ xs: 0, lg: 1 }}
         >
           <MDTypography variant="button" fontWeight="bold" color={light ? "white" : "dark"}>
-            Emprega Sapiens - Aluno
+            Emprega Sapiens - Empresas
           </MDTypography>
         </MDBox>
         <MDBox color="inherit" display={{ xs: "none", lg: "flex" }} m={0} p={0}>
-        <a href="https://www.empresa.empregasapiens.com.br/" ><ApartmentIcon
-        sx={{
-          color: ({ palette: { white, secondary } }) => (light ? white.main : secondary.main),
-          verticalAlign: "middle",
-        }}
-        />
-       
-      
-      <MDTypography
-        variant="button"
-        fontWeight="regular"
-        color={light ? "white" : "dark"}
-        textTransform="capitalize"
-        sx={{ width: "100%", lineHeight: 0 }}
-      >
-        &nbsp; Empresa
-      </MDTypography> </a>
+
+          <DefaultNavbarLink icon="apartment" name="Empresa" route="/" light={light} />
           <DefaultNavbarLink
             icon="key"
             name="Login"
             route="/"
             light={light}
           />
-          
+          <DefaultNavbarLink
+            icon="account_circle"
+            name="Cadastre-se"
+            route="/cadastro"
+            light={light}
+          />
         </MDBox>
         {action &&
           (action.type === "internal" ? (
@@ -189,8 +176,8 @@ DefaultNavbar.propTypes = {
   action: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.shape({
-      type: PropTypes.oneOf(["external", "internal"]),
-      route: PropTypes.string,
+      type: PropTypes.oneOf(["external", "internal"]).isRequired,
+      route: PropTypes.string.isRequired,
       color: PropTypes.oneOf([
         "primary",
         "secondary",
@@ -201,7 +188,7 @@ DefaultNavbar.propTypes = {
         "dark",
         "light",
       ]),
-      label: PropTypes.string,
+      label: PropTypes.string.isRequired,
     }),
   ]),
 };

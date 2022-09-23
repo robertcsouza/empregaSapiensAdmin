@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import MDInput from "components/MDInput";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
@@ -27,7 +27,6 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import Chip from '@mui/material/Chip';
-import SnackBarComponent from "components/SnackBarComponent";
 
 
 //import masked 
@@ -40,10 +39,9 @@ import { useSelector, useDispatch } from "react-redux";
 //import formik
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { updateProfile } from "slices/userSlice";
-import { salvarHabilidades, loadHabilidades, deleteHabilidade } from "slices/habilidadesSlice";
-import SearchList from "components/SearchList";
-import { createSkills } from "slices/habilidadesSlice";
+import { updateCompany } from "slices/userSlice";
+import Location from "../locations";
+import filterLocation from "../locations/filterLocation";
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -52,79 +50,58 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 
-export default function PersonalForm() {
+export default function PersonalForm({ callSnack }) {
   const dispatch = useDispatch();
-  const user = useSelector(state => state.user);
-  const habilidades = useSelector(state => state.habilidades);
-  const skills = useSelector(state => state.habilidades.skills);
-  console.log(skills)
-  const [snackContent, setSnackContent] = useState({});
-  const [snackOpen, setSnackOpen] = useState(false);
-  const closeSnack = () => setSnackOpen(false);
-  function openSnack(content) {
-    setSnackContent(content)
-    setSnackOpen(true)
-  };
 
-  const handleDialogOpen = () => { setOpen(true); };
-  const handleDialogClose = () => { setOpen(false); };
 
+
+  const [openLocation, setOpenLocation] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-
-  const itemList = [
-    { id: 1, nome: "Flutter", course: 194 },
-    { id: 2, nome: "Java", course: 194 },
-    { id: 3, nome: "Gerencia de banco de dados", course: 194 },
+  const [changeInput, setChangeInput] = React.useState();
+  const [ufId, setUfId] = React.useState(0);
 
 
-  ];
+  const status = useSelector(state => state.user.status)
 
+  const company = useSelector(state => state.user.company)
 
+  const handleDialogLocationOpen = () => { setOpenLocation(true); };
+  const handleDialogLocationClose = () => { setOpenLocation(false); };
 
+  const formik = useFormik({
+    initialValues: {
+      nome: !!company.data.nome ? company.data.nome : '',
+      cnpj: !!company.data.cnpj ? company.data.cnpj : '',
+      telefone: !!company.data.telefone ? company.data.telefone : '',
+      residencial: !!company.data.residencial ? company.data.residencial : '',
+      sobre: !!company.data.sobre ? company.data.sobre : '',
+      responsavel: !!company.data.responsavel ? company.data.responsavel : '',
+      ramo: !!company.data.ramo ? company.data.ramo : '',
+      estado: !!company.data.endereco.estado ? company.data.endereco.estado : '',
+      cidade: !!company.data.endereco.cidade ? company.data.endereco.cidade : '',
+      bairro: !!company.data.endereco.bairro ? company.data.endereco.bairro : '',
+      rua: !!company.data.endereco.rua ? company.data.endereco.rua : '',
+      numero: !!company.data.endereco.numero ? company.data.endereco.numero : '',
+      cep: !!company.data.endereco.cep ? company.data.endereco.cep : '',
+    },
 
+  });
 
-
-  async function adicionarConhecimento(conhecimentoValue) {
-
-
-    const conhecimento = conhecimentoValue.nome
-
-    if (!!conhecimentoValue.isNew) {
-      dispatch(createSkills({ nome: conhecimento }))
-    }
-
-    if (habilidades.habilidades.data.length > 4) {
-      openSnack({ type: 'warning', title: "Maximo de Habilidades", body: "Maximo de habilidades atingido, nao é possivel adicionar mais", dateTime: "1 min ago" });
-    } else {
-      dispatch(salvarHabilidades({ conhecimento }));
-    }
-
-    //dispatch(loadHabilidades());
-
-    handleDialogClose();
-  }
-
-  async function removerConhecimento(item) {
-
-    dispatch(deleteHabilidade(item.id))
-
-  }
-
+  useEffect(() => {
+    console.log("chamou o effect")
+    setUfId(filterLocation(formik.values.estado).id)
+  }, [formik.values.estado])
 
   async function update() {
     const payload = {
       perfil: {
         nome: formik.values.nome,
-        nascimento: formik.values.nascimento,
-        estado_civil: formik.values.estadoCivil,
-        about: formik.values.about,
-        sexo: formik.values.sexo,
+        cnpj: formik.values.cnpj,
         telefone: formik.values.telefone,
         residencial: formik.values.residencial,
-        email: formik.values.email,
-        empregado: formik.values.empregado,
-        linkedin: formik.values.linkedin,
-        facebook: formik.values.facebook
+        sobre: formik.values.sobre,
+        responsavel: formik.values.responsavel,
+        ramo: formik.values.ramo,
       },
       endereco: {
         estado: formik.values.estado,
@@ -136,175 +113,59 @@ export default function PersonalForm() {
       },
 
     }
-
-    console.log(payload)
-    const response = await dispatch(updateProfile(payload))
-
-
-
-    if (response.type === "profile/updated/rejected") {
-      openSnack({ type: 'error', title: "Atualizar Informações", body: "Não foi possivel atualizar as informações", dateTime: "1 min ago" });
-    } else {
-      openSnack({ type: 'success', title: "Informaçoes atualizadas", body: "Informaçoes atualizadas com sucesso", dateTime: "1 min ago" });
-
-    }
-
+    const response = await dispatch(updateCompany(payload))
+    callSnack(response);
   }
 
-
-  const validationSchema = yup.object({
-    email: yup
-      .string('Insira seu email')
-      .email('Insira um email Válido')
-      .required('Email obrigatório'),
-
-  });
-
-  const formik = useFormik({
-    initialValues: {
-      nome: user.profile.nome ? user.profile.nome : '',
-      nascimento: user.profile.nascimento ? user.profile.nascimento : '',
-      estadoCivil: user.profile.estado_civil ? user.profile.estado_civil : '',
-      about: user.profile.about ? user.profile.about : '',
-      sexo: user.profile.sexo ? user.profile.sexo : '',
-      telefone: user.profile.telefone ? user.profile.telefone : '',
-      residencial: user.profile.residencial ? user.profile.residencial : '',
-      email: user.profile.email ? user.profile.email : '',
-      empregado: user.profile.empregado ? user.profile.empregado : 0,
-      estado: user.profile.endereco.estado ? user.profile.endereco.estado : '',
-      cidade: user.profile.endereco.cidade ? user.profile.endereco.cidade : '',
-      bairro: user.profile.endereco.bairro ? user.profile.endereco.bairro : '',
-      rua: user.profile.endereco.rua ? user.profile.endereco.rua : '',
-      numero: user.profile.endereco.numero ? user.profile.endereco.numero : '',
-      cep: user.profile.endereco.cep ? user.profile.endereco.cep : '',
-      linkedin: user.profile.linkedin ? user.profile.linkedin : '',
-      facebook: user.profile.facebook ? user.profile.facebook : ''
-
-    },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
-  });
-
+  function setUf(item) {
+    setUfId(filterLocation(item).id)
+    formik.setFieldValue('estado', item);
+  }
+  function setCity(item) {
+    formik.setFieldValue('cidade', item);
+  }
 
   const sx = { mr: 1, mb: 2 }
   const sxTextArea = { minWidth: 250 }
+  const location = useMemo(() => <Location open={openLocation} handleDialogClose={handleDialogLocationClose} setUf={setUf} setCity={setCity} input={changeInput} id={ufId} />, [openLocation]);
 
   return (
     <div>
-      <SnackBarComponent content={snackContent} open={snackOpen} closeSnack={closeSnack} />
+      {location}
       <MDBox mt={5} mb={1}>
-        <MDInput variant="outlined" label="nome" className="input" id="nome"
+        <MDInput variant="outlined" label="Nome da Empresa" className="input" id="nome"
           name="nome"
           onChange={formik.handleChange}
           value={formik.values.nome}
           sx={sx} />
 
-        <InputMask
-          mask="99/99/9999"
+      </MDBox>
 
-          value={formik.values.nascimento}
+      <MDBox mt={1} mb={1}>
+        <MDInput variant="outlined" label="Responsavel" className="input" id="responsavel"
+          name="responsavel"
           onChange={formik.handleChange}
-          disabled={false}
-          maskChar=" "
-        >
-          {() => <MDInput variant="outlined" label="Data Nascimento" className="input" sx={sx} name="nascimento"
-            id="nascimento" />}
-        </InputMask>
-        <MDBox mt={1} mb={2} sx={{ minWidth: 200 }}>
-          <FormControl sx={{ minWidth: 120 }} >
-            <InputLabel id="demo-simple-select-label">Estado Civíl</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="estadoCivil"
-              name="estadoCivil"
-              value={formik.values.estadoCivil}
-              onChange={formik.handleChange}
-              label="Estado Civíl"
-              sx={{ padding: 1 }}
+          value={formik.values.responsavel}
+          sx={sx} />
 
-            >
-              <MenuItem value="solteiro">Solteiro</MenuItem>
-              <MenuItem value="casado">Casado</MenuItem>
-              <MenuItem value="separado">Separado</MenuItem>
-              <MenuItem value="divorciado">Divorciado</MenuItem>
-              <MenuItem value="viuvo">Viúvo</MenuItem>
-            </Select>
-          </FormControl>
-        </MDBox>
+      </MDBox>
+
+      <MDBox mt={1} mb={1}>
+        <MDInput variant="outlined" label="CNPJ" className="input" id="cnpj"
+          name="cnpj"
+          onChange={formik.handleChange}
+          value={formik.values.cnpj}
+          sx={sx} />
+
       </MDBox>
 
 
       <MDBox mt={1} mb={1} className="container">
-        <MDInput label="Sobre Você" multiline rows={5} className="input" sx={sxTextArea}
-          name="about"
-          id="about"
-          value={formik.values.about}
-          onChange={formik.handleChange} />
-
-      </MDBox>
-      <MDTypography variant="h6" fontWeight="medium">
-        Habilidades </MDTypography>
-      <MDBox mt={1} mb={1} className="container">
-
-        <Button variant="contained" endIcon={<AddIcon color="white" />} onClick={handleDialogOpen}>
-          <MDTypography variant="caption" color="white">
-            Adicionar </MDTypography>
-        </Button>
-        <Dialog
-          open={open}
-          TransitionComponent={Transition}
-          keepMounted
-          onClose={handleDialogClose}
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <DialogTitle>{"Habilidades"}</DialogTitle>
-          <DialogContent>
-
-            <MDBox>
-              <SearchList itemList={skills.data} call={adicionarConhecimento} />
-            </MDBox>
-
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>Sair</Button>
-
-          </DialogActions>
-        </Dialog>
-
-      </MDBox>
-
-      <MDBox mt={2} mb={2}>
-
-        {habilidades.status === 'sucess' ? habilidades.habilidades.data.map((item) => {
-
-          return (<Chip key={item.id} sx={{ ml: 1, mr: 1, mt: 1, mb: 1 }}
-            label={item.conhecimento}
-            onDelete={() => { removerConhecimento(item) }}
-          />)
-        }) : <MDBox></MDBox>}
-
-      </MDBox>
-
-
-      <MDBox mt={1} mb={4} className="container">
-        <FormControl className="radioForm">
-          <FormLabel id="demo-radio-buttons-group-label">Sexo</FormLabel>
-          <RadioGroup
-            aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue="female"
-            name="sexo"
-            id="sexo"
-            value={formik.values.sexo}
-            onChange={formik.handleChange}
-          >
-            <FormControlLabel value="Feminino" control={<Radio />} label="Feminino" sx={sx} />
-            <FormControlLabel value="Masculino" control={<Radio />} label="Masculino" sx={sx} />
-            <FormControlLabel value="Outros" control={<Radio />} label="Outos" sx={sx} />
-          </RadioGroup>
-        </FormControl>
-      </MDBox>
+        <MDInput label="Sobre a Empresa" multiline rows={5} className="input" sx={sxTextArea}
+          name="sobre"
+          id="sobre"
+          value={formik.values.sobre}
+          onChange={formik.handleChange} /> </MDBox>
 
 
       <MDTypography variant="h6" fontWeight="medium">
@@ -333,30 +194,16 @@ export default function PersonalForm() {
             name="residencial" />}
         </InputMask>
 
-        <MDInput variant="outlined" label="Email" className="input" sx={sx} name="email" id="email" onChange={formik.handleChange}
-          value={formik.values.email} />
+
       </MDBox>
 
-      <MDBox mt={5} mb={4} className="container">
-        <FormControl className="radioForm">
-          <FormLabel id="demo-radio-buttons-group-label">Está empregado atualmente ?</FormLabel>
-          <RadioGroup
-            aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue={0}
-            onChange={formik.handleChange}
-            value={formik.values.empregado}
-            name="empregado">
-            <FormControlLabel value={0} control={<Radio />} label="Não" />
-            <FormControlLabel value={1} control={<Radio />} label="Sim" />
-          </RadioGroup>
-        </FormControl>
-      </MDBox>
+
       <MDTypography variant="h6" fontWeight="medium">
         Endereço </MDTypography>
       <MDBox mt={1} mb={1} className="container">
-        <MDInput variant="outlined" label="Estado" className="input" sx={sx} id="estado" name="estado" onChange={formik.handleChange}
-          value={formik.values.estado} />
-        <MDInput variant="outlined" label="Cidade" className="input" sx={sx} id="cidade" name="cidade" onChange={formik.handleChange}
+        <MDInput variant="outlined" label="Estado" className="input" sx={sx} id="estado" name="estado" readOnly onClick={() => { setChangeInput(0); handleDialogLocationOpen(); }}
+          value={filterLocation(formik.values.estado).content} />
+        <MDInput variant="outlined" label="Cidade" className="input" sx={sx} id="cidade" name="cidade" readOnly onClick={() => { setChangeInput(1); handleDialogLocationOpen(); }}
           value={formik.values.cidade} />
         <MDInput variant="outlined" label="Bairro" className="input" sx={sx} id="bairro" name="bairro" onChange={formik.handleChange}
           value={formik.values.bairro} />
@@ -372,19 +219,8 @@ export default function PersonalForm() {
           value={formik.values.cep} />
       </MDBox>
 
-      <MDTypography variant="h6" fontWeight="medium">
-        Rede Sociais </MDTypography>
-
       <MDBox mt={4} mb={4} className="container">
-        <MDInput variant="outlined" label="LinkedIn" className="input" sx={sx} id="linkedin" name="linkedin" onChange={formik.handleChange}
-          value={formik.values.linkedin} />
-        <MDInput variant="outlined" label="Facebook" className="input" sx={sx} id="facebook" name="facebook" onChange={formik.handleChange}
-          value={formik.values.facebook} />
-      </MDBox>
-
-
-      <MDBox mt={4} mb={4} className="container">
-        <MDButton variant="gradient" color="success" size="large" className="bt" onClick={() => { update() }} >Salvar</MDButton>
+        <MDButton variant="gradient" color="success" size="small" className="bt" onClick={() => { update() }} >Salvar</MDButton>
 
       </MDBox>
 
@@ -393,17 +229,3 @@ export default function PersonalForm() {
     </div >
   );
 }
-
-
-
-/*
-<MDInput variant="outlined" label="Adicionar Abilidades" className="input" id="conhecimento"
-                name="conhecimento"
-                onChange={(event) => { setConhecimentoInput(event.target.value) }}
-                value={conhecimentoInput}
-                sx={sx} />
-                <Button variant="contained" endIcon={<AddIcon color="white" />} onClick={adicionarConhecimento}>
-                  <MDTypography variant="caption" color="white">
-                    Adicionar </MDTypography>
-                </Button>
-*/

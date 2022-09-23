@@ -67,5 +67,27 @@ function SimpleBlogCard({ image, title, description, action }) {
   );
 }
 
+// Typechecking props for the SimpleBlogCard
+SimpleBlogCard.propTypes = {
+  image: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  action: PropTypes.shape({
+    type: PropTypes.oneOf(["external", "internal"]).isRequired,
+    route: PropTypes.string.isRequired,
+    color: PropTypes.oneOf([
+      "primary",
+      "secondary",
+      "info",
+      "success",
+      "warning",
+      "error",
+      "dark",
+      "light",
+      "default",
+    ]),
+    label: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default SimpleBlogCard;

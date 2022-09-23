@@ -83,7 +83,7 @@ DataTableHeadCell.defaultProps = {
 // Typechecking props for the DataTableHeadCell
 DataTableHeadCell.propTypes = {
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
   sorted: PropTypes.oneOf([false, "none", "asce", "desc"]),
   align: PropTypes.oneOf(["left", "right", "center"]),
 };

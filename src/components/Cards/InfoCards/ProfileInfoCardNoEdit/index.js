@@ -14,11 +14,8 @@ import MDTypography from "components/MDTypography";
 import colors from "assets/theme/base/colors";
 import typography from "assets/theme/base/typography";
 
-import Slide from '@mui/material/Slide';
-import Chip from '@mui/material/Chip';
 
-
-function ProfileInfoCardNoEdit({ title, description, habilidades, info, social, action, shadow }) {
+function ProfileInfoCardNoEdit({ title, description, info, social, action, shadow }) {
   const labels = [];
   const values = [];
   const { socialMediaColors } = colors;
@@ -54,19 +51,19 @@ function ProfileInfoCardNoEdit({ title, description, habilidades, info, social, 
   // Render the card social media icons
   const renderSocial = social.map(({ link, icon, color }) => (
     !!link ? <MDBox
-      key={color}
-      component="a"
-      href={link}
-      target="_blank"
-      rel="noreferrer"
-      fontSize={size.lg}
-      color={socialMediaColors[color].main}
-      pr={1}
-      pl={0.5}
-      lineHeight={1}
-    >
-      {icon}
-    </MDBox> : <MDBox></MDBox>
+    key={color}
+    component="a"
+    href={link}
+    target="_blank"
+    rel="noreferrer"
+    fontSize={size.lg}
+    color={socialMediaColors[color].main}
+    pr={1}
+    pl={0.5}
+    lineHeight={1}
+  >
+    {icon}
+  </MDBox> : <MDBox></MDBox>
   ));
 
   return (
@@ -81,19 +78,6 @@ function ProfileInfoCardNoEdit({ title, description, habilidades, info, social, 
           <MDTypography variant="button" color="text" fontWeight="light">
             {description}
           </MDTypography>
-        </MDBox>
-        <MDBox mb={2} lineHeight={1}>
-          <MDTypography variant="h6" fontWeight="medium">
-            Habilidades Pessoais
-          </MDTypography>
-        </MDBox>
-        <MDBox>
-          {habilidades.map((item,index) => {
-            return (
-              <Chip key={index} sx={{ ml: 1, mr: 1 }}
-                label={item.conhecimento}
-              />)
-          })}
         </MDBox>
         <MDBox opacity={0.3}>
           <Divider />
@@ -119,13 +103,13 @@ ProfileInfoCardNoEdit.defaultProps = {
 
 // Typechecking props for the ProfileInfoCard
 ProfileInfoCardNoEdit.propTypes = {
-  title: PropTypes.string,
-  description: PropTypes.string,
-  info: PropTypes.objectOf(PropTypes.string),
-  social: PropTypes.arrayOf(PropTypes.object),
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  info: PropTypes.objectOf(PropTypes.string).isRequired,
+  social: PropTypes.arrayOf(PropTypes.object).isRequired,
   action: PropTypes.shape({
-    route: PropTypes.string,
-    tooltip: PropTypes.string,
+    route: PropTypes.string.isRequired,
+    tooltip: PropTypes.string.isRequired,
   }),
   shadow: PropTypes.bool,
 };

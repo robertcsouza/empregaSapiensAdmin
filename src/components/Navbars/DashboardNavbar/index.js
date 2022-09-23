@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 // react-router components
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -12,18 +12,16 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import Icon from "@mui/material/Icon";
-import MDAvatar from "components/MDAvatar";
-import LogoutIcon from '@mui/icons-material/Logout';
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import MDAvatar from "components/MDAvatar";
 
 // Material Dashboard 2 React example components
 import Breadcrumbs from "components/Breadcrumbs";
 import NotificationItem from "components/Items/NotificationItem";
+import { Badge } from "@mui/material";
 
 // Custom styles for DashboardNavbar
 import {
@@ -41,69 +39,45 @@ import {
   setMiniSidenav,
   setOpenConfigurator,
 } from "context";
+
+import { useSelector } from "react-redux";
+
 import baseURL from "service/baseUrl";
-import Badge from '@mui/material/Badge';
-import { AlertsHK } from "hooks/alerts/alertsHK";
+import { loadAlerts, deleteAlerts } from "slices/alertSlice";
+import { load } from "slices/userSlice";
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useDispatch } from "react-redux";
 import MDTypography from "components/MDTypography";
-import { deleteAlerts } from "slices/alertSlice";
 
 function DashboardNavbar({ absolute, light, isMini }) {
-  const alertsHook = AlertsHK();
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
   const alerts = useSelector(state => state.alerts);
-  const profile = useSelector(state => state.user.profile);
   const dispatchSlice = useDispatch();
-
-
   useEffect(() => {
-
-    alertsHook();
-
-    // Setting the navbar type
-    if (fixedNavbar) {
-      setNavbarType("sticky");
-    } else {
-      setNavbarType("static");
+    async function load() {
+      await dispatchSlice(loadAlerts());
     }
-
-    // A function that sets the transparent state of the navbar.
-    function handleTransparentNavbar() {
-      setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
-    }
-
-    /** 
-     The event listener that's calling the handleTransparentNavbar function when 
-     scrolling the window.
-    */
-    // isso vai disparar o evento quando o usuario rola a tela <<<<<<<<
-    // window.addEventListener("scroll", handleTransparentNavbar);
-
-    // Call the handleTransparentNavbar function to set the state with the initial value.
-    handleTransparentNavbar();
-
-    // Remove event listener on cleanup
-    return () => window.removeEventListener("scroll", handleTransparentNavbar);
-  }, [dispatch, fixedNavbar]);
+    load();
+    setNavbarType("static");
+  }, []);
 
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+
   let navigate = useNavigate();
-
-
+  const profile = useSelector(state => state.user.company);
 
   function deleteAlerta(id) {
 
     dispatchSlice(deleteAlerts(id))
   }
 
-
-  // Render the notifications menu
   const renderMenu = () => (
     <Menu
       anchorEl={openMenu}
@@ -116,17 +90,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
       onClose={handleCloseMenu}
       sx={{ mt: 2 }}
     >
-      {alerts.alerts.data.data.length === 0 ? <MDTypography variant="caption">Não há notificações</MDTypography> : alerts.alerts.data.data.map((item, index) => {
-        return <NotificationItem key={index} icon={<Icon>email</Icon>} title={item.title} message={item.message} data={item.created_at} call={() => { deleteAlerta(item.id) }} route={"/subscription"} />
+      {alerts.alerts.data.length === 0 ? <MDTypography variant="caption">Não há notificações</MDTypography> : alerts.alerts.data.map((item, index) => {
+        return <NotificationItem key={index} icon={<Icon>email</Icon>} title={item.title} message={item.message} data={item.created_at} call={() => { deleteAlerta(item.id) }} route={"/vagas"} />
       })}
 
     </Menu>
   );
 
-  async function logout() {
-    await sessionStorage.setItem('token', '');
-    navigate('/');
-  }
   // Styles for the navbar icons
   const iconsStyle = ({ palette: { dark, white, text }, functions: { rgba } }) => ({
     color: () => {
@@ -140,9 +110,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
     },
   });
 
+  async function logout() {
+    await sessionStorage.setItem('token', '');
+    navigate('/');
+  }
   return (
     <AppBar
-      position={"static"}
+      position={absolute ? "absolute" : navbarType}
       color="inherit"
       sx={(theme) => navbar(theme, { transparentNavbar, absolute, light, darkMode })}
     >
@@ -154,10 +128,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
 
             <MDBox color={light ? "white" : "inherit"}>
-              {!!profile.thumbnail ?
+              {!!profile ?
                 <Link to="/profile">
                   <IconButton sx={navbarIconButton} size="small" disableRipple>
-                    <MDAvatar src={`${baseURL}${profile.thumbnail}`} alt="Profile" size="xs" />
+                    <MDAvatar src={`${baseURL}${profile.data.thumbnail}`} alt="Profile" size="sm" />
                   </IconButton>
                 </Link>
                 : <Link to="/authentication/sign-in/basic">
@@ -165,7 +139,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     <Icon sx={iconsStyle}>account_circle</Icon>
                   </IconButton>
                 </Link>}
-
               <IconButton
                 size="small"
                 disableRipple
@@ -177,7 +150,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   {miniSidenav ? "menu_open" : "menu"}
                 </Icon>
               </IconButton>
-
+              
               <IconButton
                 size="small"
                 disableRipple
@@ -188,7 +161,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 variant="contained"
                 onClick={handleOpenMenu}
               >
-                {alerts.status === 'sucess' && alerts.alerts.data.data.length > 0 ? <Badge badgeContent={alerts.alerts.data.data.length} color="info">
+                {alerts.status === 'sucess' && alerts.alerts.data.length > 0 ? <Badge badgeContent={alerts.alerts.data.length} color="info">
                   <Icon sx={iconsStyle}>notifications</Icon>
                 </Badge> : <Icon sx={iconsStyle}>notifications</Icon>}
 

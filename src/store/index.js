@@ -1,22 +1,23 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import userReducer from 'slices/userSlice';
+import userReducer from "slices/userSlice";
+import cursoReducer from 'slices/cursoSlice';
 import vagaReducer from 'slices/vagaSlice';
-import subscriptionReducer from 'slices/SubscriptionSlice';
-import habilidadesReducer from 'slices/habilidadesSlice';
-import selectedVagareducer from 'slices/selectedVagaSlice';
-import analyticsReducer from 'slices/analyticsSlice';
+import stepReducer from 'slices/stepSlice';
+import analyticsReducer from 'slices/analytics';
+import notificationSlice from 'slices/notificationSlice';
 import alertReducer from 'slices/alertSlice';
-
+import locationReducer from 'slices/locationSlice';
 
 export default configureStore({
     reducer: {
         user: userReducer,
-        vagas: vagaReducer,
-        subscription: subscriptionReducer,
-        habilidades: habilidadesReducer,
-        selectedVaga: selectedVagareducer,
+        course: cursoReducer,
+        jobs: vagaReducer,
+        steps: stepReducer,
         analytics: analyticsReducer,
-        alerts:alertReducer
+        notification: notificationSlice,
+        alerts: alertReducer,
+        location: locationReducer
     },
     middleware: getDefaultMiddleware({
         serializableCheck: false,
