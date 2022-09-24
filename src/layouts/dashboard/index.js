@@ -17,7 +17,7 @@ import ReportsBarChart from "components/Charts/BarCharts/ReportsBarChart";
 import ComplexStatisticsCard from "components/Cards/StatisticsCards/ComplexStatisticsCard";
 
 import auth from '../../service/auth'
-import CompaniesPending from "layouts/companiesPending";
+
 import CompanyComponent from "layouts/companiesPending/companyComponent";
 
 
@@ -137,7 +137,7 @@ function Dashboard() {
                   <ReportsBarChart
                     color="warning"
                     title="Empresas aderiram a plataforma"
-                    description="Quantidade de alunos cadastrados por mês"
+                    description="Alunos cadastrados por mês"
                     date="informação recuperdada hoje"
                     chart={{
                       labels: ["jan", "fev", "mar", "Abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
