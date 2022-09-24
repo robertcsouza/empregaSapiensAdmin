@@ -2,12 +2,16 @@
 import Dashboard from "layouts/dashboard";
 
 import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
-import Profile from "layouts/profile"
+
+
 // @mui icons
 import Icon from "@mui/material/Icon";
-
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import PeopleIcon from '@mui/icons-material/People';
 import NewPassword from "layouts/authentication/reset-password/newPassword";
+import CompaniesPending from "layouts/companiesPending";
+import CreateUser from "layouts/createUser";
+import Cover from "layouts/authentication/reset-password/cover";
 
 const routes = [
   {
@@ -15,13 +19,12 @@ const routes = [
     route: "/",
     component: <SignIn />,
   },
+
   {
-    key: "sign-up",
-    route: "/cadastro",
-    component: <SignUp />,
+    key: "reset-password",
+    route: "/reset",
+    component: <Cover />,
   },
-
-
   {
     key: "reset-password",
     route: "/reset/newpassword/",
@@ -36,17 +39,23 @@ const routes = [
     route: "/dashboard",
     component: <Dashboard />,
   },
-
-
-
   {
     type: "collapse",
-    name: "Perfil",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
+    name: "Aprovar Empresa",
+    key: "companies",
+    icon: <ApartmentIcon />,
+    route: "/companies",
+    component: <CompaniesPending />,
   },
+  {
+    type: "collapse",
+    name: "Criar Usuário",
+    key: "users",
+    icon: <PeopleIcon />,
+    route: "/users",
+    component: <CreateUser />,
+  },
+
 
 
 

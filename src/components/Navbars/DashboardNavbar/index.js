@@ -43,7 +43,7 @@ import {
 import { useSelector } from "react-redux";
 
 import baseURL from "service/baseUrl";
-import { loadAlerts, deleteAlerts } from "slices/alertSlice";
+
 import { load } from "slices/userSlice";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useDispatch } from "react-redux";
@@ -58,10 +58,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const alerts = useSelector(state => state.alerts);
   const dispatchSlice = useDispatch();
   useEffect(() => {
-    async function load() {
-      await dispatchSlice(loadAlerts());
-    }
-    load();
     setNavbarType("static");
   }, []);
 
@@ -71,12 +67,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleCloseMenu = () => setOpenMenu(false);
 
   let navigate = useNavigate();
-  const profile = useSelector(state => state.user.company);
-
-  function deleteAlerta(id) {
-
-    dispatchSlice(deleteAlerts(id))
-  }
 
   const renderMenu = () => (
     <Menu
@@ -90,9 +80,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
       onClose={handleCloseMenu}
       sx={{ mt: 2 }}
     >
-      {alerts.alerts.data.length === 0 ? <MDTypography variant="caption">Não há notificações</MDTypography> : alerts.alerts.data.map((item, index) => {
-        return <NotificationItem key={index} icon={<Icon>email</Icon>} title={item.title} message={item.message} data={item.created_at} call={() => { deleteAlerta(item.id) }} route={"/vagas"} />
-      })}
+
 
     </Menu>
   );
@@ -128,17 +116,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
 
             <MDBox color={light ? "white" : "inherit"}>
-              {!!profile ?
-                <Link to="/profile">
-                  <IconButton sx={navbarIconButton} size="small" disableRipple>
-                    <MDAvatar src={`${baseURL}${profile.data.thumbnail}`} alt="Profile" size="sm" />
-                  </IconButton>
-                </Link>
-                : <Link to="/authentication/sign-in/basic">
-                  <IconButton sx={navbarIconButton} size="small" disableRipple>
-                    <Icon sx={iconsStyle}>account_circle</Icon>
-                  </IconButton>
-                </Link>}
+
               <IconButton
                 size="small"
                 disableRipple
@@ -150,23 +128,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   {miniSidenav ? "menu_open" : "menu"}
                 </Icon>
               </IconButton>
-              
-              <IconButton
-                size="small"
-                disableRipple
-                color="inherit"
-                sx={navbarIconButton}
-                aria-controls="notification-menu"
-                aria-haspopup="true"
-                variant="contained"
-                onClick={handleOpenMenu}
-              >
-                {alerts.status === 'sucess' && alerts.alerts.data.length > 0 ? <Badge badgeContent={alerts.alerts.data.length} color="info">
-                  <Icon sx={iconsStyle}>notifications</Icon>
-                </Badge> : <Icon sx={iconsStyle}>notifications</Icon>}
 
-              </IconButton>
-              {alerts.status === 'sucess' ? renderMenu() : null}
+
               <IconButton
                 size="small"
                 disableRipple

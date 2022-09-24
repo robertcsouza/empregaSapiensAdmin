@@ -48,7 +48,9 @@ function Basic() {
 
 
   async function Login(e) {
+
     e.preventDefault();
+
     if (rememberMe) {
       localStorage.setItem('email', email);
       localStorage.setItem('remember', rememberMe);
@@ -64,9 +66,11 @@ function Basic() {
 
     if (!!result.payload.token) {
       if (result.payload.isAdmin === 'admin') {
-        navigate('/admin')
-      } else {
         navigate('/dashboard')
+
+      } else {
+        navigate('/')
+        openErrorSB();
       }
     } else {
       openErrorSB();
@@ -93,88 +97,88 @@ function Basic() {
     <BasicLayout image={bgImage}>
       {renderErrorSB}
       <MDBox mt={10}>
-      <Card>
-        <MDBox
-          variant="gradient"
-          bgColor="warning"
-          borderRadius="lg"
-          coloredShadow="warning"
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
-        >
+        <Card>
+          <MDBox
+            variant="gradient"
+            bgColor="warning"
+            borderRadius="lg"
+            coloredShadow="warning"
+            mx={2}
+            mt={-3}
+            p={2}
+            mb={1}
+            textAlign="center"
+          >
 
-          <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 3 }}>
+            <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 3 }}>
 
-            <Grid item xs={4}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                Entrar
-              </MDTypography>
+              <Grid item xs={4}>
+                <MDTypography component={MuiLink} href="#" variant="body1" color="white">
+                  Entrar
+                </MDTypography>
+              </Grid>
+
             </Grid>
-
-          </Grid>
-        </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" onSubmit={Login} role="form">
-            <MDBox mb={2}>
-              <MDInput type="text" label="Email" onChange={(event) => { setEmail(event.target.value) }} value={email} fullWidth />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput type="password" label="Senha" onChange={(event) => { setPassword(event.target.value) }} fullWidth />
-            </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-              >
-                &nbsp;&nbsp;Lembrar
-              </MDTypography>
-            </MDBox>
-            <MDBox mt={4} mb={1}>
-
-              <MDButton variant="gradient" type="submit" color="warning" fullWidth onClick={() => { Login() }}>
-                Entrar
-              </MDButton>
-            </MDBox>
-            <MDBox mb={1} textAlign="start">
-              <MDTypography variant="button" color="text">
-
+          </MDBox>
+          <MDBox pt={4} pb={3} px={3}>
+            <MDBox component="form" onSubmit={(event) => { Login(event) }} role="form">
+              <MDBox mb={2}>
+                <MDInput type="text" label="Email" onChange={(event) => { setEmail(event.target.value) }} value={email} fullWidth />
+              </MDBox>
+              <MDBox mb={2}>
+                <MDInput type="password" label="Senha" onChange={(event) => { setPassword(event.target.value) }} fullWidth />
+              </MDBox>
+              <MDBox display="flex" alignItems="center" ml={-1}>
+                <Switch checked={rememberMe} onChange={handleSetRememberMe} />
                 <MDTypography
-                  component={Link}
-                  to="/reset"
-                  variant="caption"
-                  color="warning"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  Esqueci minha senha
-                </MDTypography>
-              </MDTypography>
-            </MDBox>
-            <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
-                Ainda Não possui uma conta ?{" "}
-                <MDTypography
-                  component={Link}
-                  to="/cadastro"
                   variant="button"
-                  color="warning"
-                  fontWeight="medium"
-                  textGradient
+                  fontWeight="regular"
+                  color="text"
+                  onClick={handleSetRememberMe}
+                  sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
                 >
-                  Cadastre-se
+                  &nbsp;&nbsp;Lembrar
                 </MDTypography>
-              </MDTypography>
+              </MDBox>
+              <MDBox mt={4} mb={1}>
+
+                <MDButton variant="gradient" type="submit" color="warning" fullWidth onClick={() => { Login() }}>
+                  Entrar
+                </MDButton>
+              </MDBox>
+              <MDBox mb={1} textAlign="start">
+                <MDTypography variant="button" color="text">
+
+                  <MDTypography
+                    component={Link}
+                    to="/reset"
+                    variant="caption"
+                    color="warning"
+                    fontWeight="medium"
+                    textGradient
+                  >
+                    Esqueci minha senha
+                  </MDTypography>
+                </MDTypography>
+              </MDBox>
+              <MDBox mt={3} mb={1} textAlign="center">
+                <MDTypography variant="button" color="text">
+                  Ainda Não possui uma conta ?{" "}
+                  <MDTypography
+                    component={Link}
+                    to="/cadastro"
+                    variant="button"
+                    color="warning"
+                    fontWeight="medium"
+                    textGradient
+                  >
+                    Cadastre-se
+                  </MDTypography>
+                </MDTypography>
+              </MDBox>
             </MDBox>
           </MDBox>
-        </MDBox>
-      </Card>
+        </Card>
       </MDBox>
     </BasicLayout>
   );
